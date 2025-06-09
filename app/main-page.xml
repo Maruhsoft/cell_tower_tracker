@@ -1,0 +1,86 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo">
+    <ActionBar title="System Monitor" class="bg-gray-800" />
+
+    <ScrollView class="bg-gray-100">
+        <StackLayout class="p-4">
+            <!-- Minimal Status Section -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-4 shadow-sm">
+                <Label text="{{ statusMessage }}" class="text-sm {{ statusClass }} mb-2" textWrap="true" />
+                <Button text="{{ refreshButtonText }}" tap="{{ refreshData }}" class="bg-gray-600 text-white rounded-lg p-2 text-sm" isEnabled="{{ !isLoading }}" />
+            </StackLayout>
+
+            <!-- Signal Strength Card -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-3 shadow-sm" visibility="{{ hasData ? 'visible' : 'collapsed' }}">
+                <Label text="Signal" class="text-md font-semibold text-gray-800 mb-2" />
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="Level:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ signalStrength }}" class="{{ signalStrengthClass }} font-semibold text-sm" />
+                </StackLayout>
+                <StackLayout orientation="horizontal">
+                    <Label text="Type:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ networkType }}" class="text-gray-800 text-sm" />
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Network Details Card -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-3 shadow-sm" visibility="{{ hasData ? 'visible' : 'collapsed' }}">
+                <Label text="Network" class="text-md font-semibold text-gray-800 mb-2" />
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="MCC:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ mcc }}" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="MNC:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ mnc }}" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="LAC:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ lac }}" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal">
+                    <Label text="CID:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ cid }}" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Carrier Information Card -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-3 shadow-sm" visibility="{{ hasData ? 'visible' : 'collapsed' }}">
+                <Label text="Carrier" class="text-md font-semibold text-gray-800 mb-2" />
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="Name:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ carrierName }}" class="text-gray-800 text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal">
+                    <Label text="Country:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ countryCode }}" class="text-gray-800 text-sm" />
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Technical Details Card -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-3 shadow-sm" visibility="{{ hasData ? 'visible' : 'collapsed' }}">
+                <Label text="Technical" class="text-md font-semibold text-gray-800 mb-2" />
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="RSSI:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ rssi }} dBm" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal">
+                    <Label text="Updated:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ lastUpdated }}" class="text-gray-800 text-xs" />
+                </StackLayout>
+            </StackLayout>
+
+            <!-- No Data Message -->
+            <StackLayout class="bg-gray-50 border border-gray-200 rounded-lg p-3" visibility="{{ hasData ? 'collapsed' : 'visible' }}">
+                <Label text="Waiting for data..." class="text-gray-600 text-center text-sm" />
+            </StackLayout>
+        </StackLayout>
+    </ScrollView>
+</Page>
