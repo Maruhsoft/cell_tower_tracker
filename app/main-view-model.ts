@@ -11,8 +11,14 @@ export class HelloWorldModel extends Observable {
   private _statusMessage: string = 'System ready';
   private _statusClass: string = 'text-green-600';
   private _refreshButtonText: string = 'Manual Scan';
+  private _emailButtonText: string = 'Send Email';
+  private _emailStatusVisible: boolean = false;
+  private _emailStatusMessage: string = '';
+  private _emailStatusClass: string = '';
+  private _isEmailLoading: boolean = false;
   private autoScanInterval: any;
   private scanCount: number = 0;
+  private currentCellData: CellTowerInfo | null = null;
 
   // Cell tower data properties
   private _mcc: string = '';
@@ -45,6 +51,11 @@ export class HelloWorldModel extends Observable {
   get statusMessage(): string { return this._statusMessage; }
   get statusClass(): string { return this._statusClass; }
   get refreshButtonText(): string { return this._refreshButtonText; }
+  get emailButtonText(): string { return this._emailButtonText; }
+  get emailStatusVisible(): boolean { return this._emailStatusVisible; }
+  get emailStatusMessage(): string { return this._emailStatusMessage; }
+  get emailStatusClass(): string { return this._emailStatusClass; }
+  get canSendEmail(): boolean { return !this._isLoading && !this._isEmailLoading && this._hasData; }
   
   get mcc(): string { return this._mcc; }
   get mnc(): string { return this._mnc; }
@@ -85,17 +96,21 @@ export class HelloWorldModel extends Observable {
       
       if (cellInfo) {
         this.scanCount++;
+        this.currentCellData = cellInfo;
         this.updateCellData(cellInfo);
         this.updateStatus(`Auto-scan #${this.scanCount} completed`, 'text-green-600');
         this._hasData = true;
         this.notifyPropertyChange('hasData', this._hasData);
+        this.notifyPropertyChange('canSendEmail', this.canSendEmail);
         
-        // Send email with cell tower data
+        // Send email with cell tower data automatically
         const emailSent = await this.emailService.sendCellTowerData(cellInfo);
         if (emailSent) {
           console.log('Cell tower data sent via email successfully');
+          this.updateEmailStatus('Auto-email sent successfully', 'text-green-600');
         } else {
-          console.log('Failed to send email');
+          console.log('Failed to send auto-email');
+          this.updateEmailStatus('Auto-email failed to send', 'text-red-600');
         }
       } else {
         this.updateStatus('No cell data available', 'text-yellow-600');
@@ -126,28 +141,54 @@ export class HelloWorldModel extends Observable {
       const cellInfo = await this.cellTowerService.getCellTowerInfo();
       
       if (cellInfo) {
+        this.currentCellData = cellInfo;
         this.updateCellData(cellInfo);
         this.updateStatus('Manual scan completed successfully', 'text-green-600');
         this._hasData = true;
         this.notifyPropertyChange('hasData', this._hasData);
-        
-        // Send email with cell tower data
-        const emailSent = await this.emailService.sendCellTowerData(cellInfo);
-        if (emailSent) {
-          console.log('Manual scan data sent via email successfully');
-        }
+        this.notifyPropertyChange('canSendEmail', this.canSendEmail);
       } else {
         this.updateStatus('Unable to retrieve cell tower data', 'text-red-600');
         this._hasData = false;
         this.notifyPropertyChange('hasData', this._hasData);
+        this.notifyPropertyChange('canSendEmail', this.canSendEmail);
       }
     } catch (error) {
       console.error('Error refreshing cell data:', error);
       this.updateStatus(`Error: ${error.message}`, 'text-red-600');
       this._hasData = false;
       this.notifyPropertyChange('hasData', this._hasData);
+      this.notifyPropertyChange('canSendEmail', this.canSendEmail);
     } finally {
       this.setLoading(false);
+    }
+  }
+
+  public async sendEmailManually() {
+    if (this._isLoading || this._isEmailLoading || !this.currentCellData) return;
+    
+    this.setEmailLoading(true);
+    this.updateEmailStatus('Sending email...', 'text-blue-600');
+    
+    try {
+      const emailSent = await this.emailService.sendCellTowerData(this.currentCellData);
+      
+      if (emailSent) {
+        this.updateEmailStatus('Email sent successfully to maruhsoft@gmail.com', 'text-green-600');
+      } else {
+        this.updateEmailStatus('Failed to send email. Please try again.', 'text-red-600');
+      }
+    } catch (error) {
+      console.error('Error sending manual email:', error);
+      this.updateEmailStatus(`Email error: ${error.message}`, 'text-red-600');
+    } finally {
+      this.setEmailLoading(false);
+      
+      // Hide email status after 5 seconds
+      setTimeout(() => {
+        this._emailStatusVisible = false;
+        this.notifyPropertyChange('emailStatusVisible', this._emailStatusVisible);
+      }, 5000);
     }
   }
 
@@ -229,6 +270,14 @@ export class HelloWorldModel extends Observable {
     this._refreshButtonText = loading ? 'Scanning...' : 'Manual Scan';
     this.notifyPropertyChange('isLoading', this._isLoading);
     this.notifyPropertyChange('refreshButtonText', this._refreshButtonText);
+    this.notifyPropertyChange('canSendEmail', this.canSendEmail);
+  }
+
+  private setEmailLoading(loading: boolean) {
+    this._isEmailLoading = loading;
+    this._emailButtonText = loading ? 'Sending...' : 'Send Email';
+    this.notifyPropertyChange('emailButtonText', this._emailButtonText);
+    this.notifyPropertyChange('canSendEmail', this.canSendEmail);
   }
 
   private updateStatus(message: string, className: string) {
@@ -236,6 +285,15 @@ export class HelloWorldModel extends Observable {
     this._statusClass = className;
     this.notifyPropertyChange('statusMessage', this._statusMessage);
     this.notifyPropertyChange('statusClass', this._statusClass);
+  }
+
+  private updateEmailStatus(message: string, className: string) {
+    this._emailStatusMessage = message;
+    this._emailStatusClass = className;
+    this._emailStatusVisible = true;
+    this.notifyPropertyChange('emailStatusMessage', this._emailStatusMessage);
+    this.notifyPropertyChange('emailStatusClass', this._emailStatusClass);
+    this.notifyPropertyChange('emailStatusVisible', this._emailStatusVisible);
   }
 
   // Clean up interval when the view model is destroyed

@@ -6,7 +6,13 @@
             <!-- Minimal Status Section -->
             <StackLayout class="bg-white rounded-lg p-3 mb-4 shadow-sm">
                 <Label text="{{ statusMessage }}" class="text-sm {{ statusClass }} mb-2" textWrap="true" />
-                <Button text="{{ refreshButtonText }}" tap="{{ refreshData }}" class="bg-gray-600 text-white rounded-lg p-2 text-sm" isEnabled="{{ !isLoading }}" />
+                <Button text="{{ refreshButtonText }}" tap="{{ refreshData }}" class="bg-gray-600 text-white rounded-lg p-2 text-sm mb-2" isEnabled="{{ !isLoading }}" />
+                <Button text="{{ emailButtonText }}" tap="{{ sendEmailManually }}" class="bg-blue-600 text-white rounded-lg p-2 text-sm" isEnabled="{{ canSendEmail }}" />
+            </StackLayout>
+
+            <!-- Email Status Section -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-4 shadow-sm" visibility="{{ emailStatusVisible ? 'visible' : 'collapsed' }}">
+                <Label text="{{ emailStatusMessage }}" class="text-sm {{ emailStatusClass }}" textWrap="true" />
             </StackLayout>
 
             <!-- Signal Strength Card -->
