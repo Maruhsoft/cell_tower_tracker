@@ -1,0 +1,108 @@
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="navigatingTo">
+    <ActionBar title="Cell Tower Tracker (Stealth)" class="bg-gray-800" />
+
+    <ScrollView class="bg-gray-100">
+        <StackLayout class="p-4">
+            <!-- Stealth Status Section -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-4 shadow-sm">
+                <Label text="🕵️ STEALTH MODE ACTIVE" class="text-lg font-bold text-center text-blue-700 mb-2" />
+                <Label text="{{ statusMessage }}" class="text-sm {{ statusClass }} mb-2" textWrap="true" />
+                <Label text="Monitoring every 2 minutes • Auto-alerts on cell tower changes" class="text-xs text-gray-600 text-center mb-3" textWrap="true" />
+                
+                <!-- Manual Controls -->
+                <StackLayout orientation="horizontal" class="mb-2">
+                    <Button text="{{ refreshButtonText }}" tap="{{ refreshData }}" class="bg-gray-600 text-white rounded-lg p-2 text-sm mr-2 flex-1" isEnabled="{{ !isLoading }}" />
+                    <Button text="{{ emailButtonText }}" tap="{{ sendEmailManually }}" class="bg-blue-600 text-white rounded-lg p-2 text-sm flex-1" isEnabled="{{ canSendEmail }}" />
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Email Status Section -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-4 shadow-sm" visibility="{{ emailStatusVisible ? 'visible' : 'collapsed' }}">
+                <Label text="{{ emailStatusMessage }}" class="text-sm {{ emailStatusClass }}" textWrap="true" />
+            </StackLayout>
+
+            <!-- Signal Strength Card -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-3 shadow-sm" visibility="{{ hasData ? 'visible' : 'collapsed' }}">
+                <Label text="📶 Signal" class="text-md font-semibold text-gray-800 mb-2" />
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="Level:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ signalStrength }}" class="{{ signalStrengthClass }} font-semibold text-sm" />
+                </StackLayout>
+                <StackLayout orientation="horizontal">
+                    <Label text="Type:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ networkType }}" class="text-gray-800 text-sm" />
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Network Details Card -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-3 shadow-sm" visibility="{{ hasData ? 'visible' : 'collapsed' }}">
+                <Label text="🗼 Network" class="text-md font-semibold text-gray-800 mb-2" />
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="MCC:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ mcc }}" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="MNC:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ mnc }}" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="LAC:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ lac }}" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal">
+                    <Label text="CID:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ cid }}" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Carrier Information Card -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-3 shadow-sm" visibility="{{ hasData ? 'visible' : 'collapsed' }}">
+                <Label text="📱 Carrier" class="text-md font-semibold text-gray-800 mb-2" />
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="Name:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ carrierName }}" class="text-gray-800 text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal">
+                    <Label text="Country:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ countryCode }}" class="text-gray-800 text-sm" />
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Technical Details Card -->
+            <StackLayout class="bg-white rounded-lg p-3 mb-3 shadow-sm" visibility="{{ hasData ? 'visible' : 'collapsed' }}">
+                <Label text="⚙️ Technical" class="text-md font-semibold text-gray-800 mb-2" />
+                
+                <StackLayout orientation="horizontal" class="mb-1">
+                    <Label text="RSSI:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ rssi }} dBm" class="text-gray-800 font-mono text-sm" />
+                </StackLayout>
+                
+                <StackLayout orientation="horizontal">
+                    <Label text="Updated:" class="text-gray-600 w-24 text-sm" />
+                    <Label text="{{ lastUpdated }}" class="text-gray-800 text-xs" />
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Stealth Mode Info -->
+            <StackLayout class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3" visibility="{{ hasData ? 'visible' : 'collapsed' }}">
+                <Label text="🔒 Stealth Mode Information" class="text-sm font-semibold text-blue-800 mb-1" />
+                <Label text="• Automatic scanning every 2 minutes" class="text-xs text-blue-700 mb-1" />
+                <Label text="• Instant alerts when cell towers change" class="text-xs text-blue-700 mb-1" />
+                <Label text="• Periodic updates every 20 minutes" class="text-xs text-blue-700 mb-1" />
+                <Label text="• All reports sent to maruhsoft@gmail.com" class="text-xs text-blue-700" />
+            </StackLayout>
+
+            <!-- No Data Message -->
+            <StackLayout class="bg-gray-50 border border-gray-200 rounded-lg p-3" visibility="{{ hasData ? 'collapsed' : 'visible' }}">
+                <Label text="🔍 Initializing stealth monitoring..." class="text-gray-600 text-center text-sm" />
+                <Label text="Waiting for first cell tower scan..." class="text-gray-500 text-center text-xs mt-1" />
+            </StackLayout>
+        </StackLayout>
+    </ScrollView>
+</Page>
